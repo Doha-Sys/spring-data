@@ -17,6 +17,10 @@
 	<name>arangodb-spring-data</name>
 	<description>ArangoDB Spring Data</description>
 	<url>http://maven.apache.org</url>
+	
+	<properties>
+		<distribution.management.url>https://maven.pkg.github.com/Doha-Sys/${project.artifactId}</distribution.management.url>
+	</properties>
 
 	<licenses>
 		<license>
@@ -35,13 +39,10 @@
 	</developers>
 
 	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
 		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+			<id>github</id>
+			<name>GitHub OWNER Apache Maven Packages</name>
+			<url>${distribution.management.url}</url>
 		</repository>
 	</distributionManagement>
 
@@ -57,6 +58,14 @@
 		<repository>
 			<id>spring-libs-snapshot</id>
 			<url>https://repo.spring.io/libs-snapshot</url>
+		</repository>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/Doha-Sys/packages</url>
+		</repository>
+		<repository>
+			<id>github-tblu</id>
+			<url>https://maven.pkg.github.com/TBlu-Company/packages</url>
 		</repository>
 	</repositories>
 
