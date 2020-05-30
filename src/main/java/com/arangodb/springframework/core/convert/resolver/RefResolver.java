@@ -27,6 +27,8 @@ import org.springframework.data.util.TypeInformation;
 
 import com.arangodb.springframework.annotation.Ref;
 import com.arangodb.springframework.core.ArangoOperations;
+import com.arangodb.springframework.core.mapping.ArangoPersistentEntity;
+import com.arangodb.springframework.core.util.MetadataUtils;
 
 /**
  * @author Mark Vollmary
@@ -57,6 +59,11 @@ public class RefResolver extends AbstractResolver<Ref>
 	@Override
 	public Object resolve(final String id, final TypeInformation<?> type, final Ref annotation) {
 		return template.find(id, type.getType()).get();
+	}
+
+	@Override
+	public String writeRef(Object source, ArangoPersistentEntity<?> entity, String id) {
+		return MetadataUtils.createIdFromCollectionAndKey(entity.getCollection(), id);
 	}
 
 }

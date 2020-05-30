@@ -80,11 +80,14 @@ import com.arangodb.velocypack.ValueType;
 import com.arangodb.velocypack.internal.util.DateUtil;
 import com.arangodb.velocypack.module.jdk8.internal.util.JavaTimeUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author Mark Vollmary
  * @author Christian Lechner
  * @author Reşat SABIQ
  */
+@Slf4j
 public class DefaultArangoConverter implements ArangoConverter {
 
 	private static final String _ID = "_id";
@@ -101,8 +104,9 @@ public class DefaultArangoConverter implements ArangoConverter {
 	private final ArangoTypeMapper typeMapper;
 
 	public DefaultArangoConverter(
-		final MappingContext<? extends ArangoPersistentEntity<?>, ArangoPersistentProperty> context,
-		final CustomConversions conversions, final ResolverFactory resolverFactory, final ArangoTypeMapper typeMapper) {
+			final MappingContext<? extends ArangoPersistentEntity<?>, ArangoPersistentProperty> context,
+			final CustomConversions conversions, final ResolverFactory resolverFactory,
+			final ArangoTypeMapper typeMapper) {
 
 		this.context = context;
 		this.conversions = conversions;
@@ -186,10 +190,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 		return readEntity(typeToUse, source, entity);
 	}
 
-	private Object readEntity(
-		final TypeInformation<?> type,
-		final VPackSlice source,
-		final ArangoPersistentEntity<?> entity) {
+	private Object readEntity(final TypeInformation<?> type, final VPackSlice source,
+			final ArangoPersistentEntity<?> entity) {
 
 		if (!source.isObject()) {
 			throw new MappingException(
@@ -221,12 +223,9 @@ public class DefaultArangoConverter implements ArangoConverter {
 		return instance;
 	}
 
-	private void readProperty(
-		final ArangoPersistentEntity<?> entity,
-		final String parentId,
-		final PersistentPropertyAccessor<?> accessor,
-		final VPackSlice source,
-		final ArangoPersistentProperty property) {
+	private void readProperty(final ArangoPersistentEntity<?> entity, final String parentId,
+			final PersistentPropertyAccessor<?> accessor, final VPackSlice source,
+			final ArangoPersistentProperty property) {
 
 		final Object propertyValue = readPropertyValue(entity, parentId, source, property);
 		if (propertyValue != null || !property.getType().isPrimitive()) {
@@ -234,11 +233,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 		}
 	}
 
-	private Object readPropertyValue(
-		final ArangoPersistentEntity<?> entity,
-		final String parentId,
-		final VPackSlice source,
-		final ArangoPersistentProperty property) {
+	private Object readPropertyValue(final ArangoPersistentEntity<?> entity, final String parentId,
+			final VPackSlice source, final ArangoPersistentProperty property) {
 
 		final Optional<Ref> ref = property.getRef();
 		if (ref.isPresent()) {
@@ -299,7 +295,7 @@ public class DefaultArangoConverter implements ArangoConverter {
 		final TypeInformation<?> componentType = getNonNullComponentType(type);
 		final Class<?> collectionType = Iterable.class.equals(type.getType()) ? Collection.class : type.getType();
 		final Collection<Object> collection = CollectionFactory.createCollection(collectionType,
-			componentType.getType(), source.getLength());
+				componentType.getType(), source.getLength());
 
 		final Iterator<VPackSlice> iterator = source.arrayIterator();
 
@@ -329,10 +325,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Optional<Object> readReference(
-		final VPackSlice source,
-		final ArangoPersistentProperty property,
-		final Annotation annotation) {
+	private Optional<Object> readReference(final VPackSlice source, final ArangoPersistentProperty property,
+			final Annotation annotation) {
 
 		final Optional<ReferenceResolver<Annotation>> resolver = resolverFactory.getReferenceResolver(annotation);
 
@@ -361,17 +355,14 @@ public class DefaultArangoConverter implements ArangoConverter {
 		}
 	}
 
-	private <A extends Annotation> Optional<Object> readRelation(
-		final ArangoPersistentEntity<?> entity,
-		final String parentId,
-		final VPackSlice source,
-		final ArangoPersistentProperty property,
-		final A annotation) {
+	private <A extends Annotation> Optional<Object> readRelation(final ArangoPersistentEntity<?> entity,
+			final String parentId, final VPackSlice source, final ArangoPersistentProperty property,
+			final A annotation) {
 
 		final Class<? extends Annotation> collectionType = entity.findAnnotation(Edge.class) != null ? Edge.class
 				: Document.class;
 		final Optional<RelationResolver<Annotation>> resolver = resolverFactory.getRelationResolver(annotation,
-			collectionType);
+				collectionType);
 
 		if (!resolver.isPresent()) {
 			return Optional.empty();
@@ -523,8 +514,7 @@ public class DefaultArangoConverter implements ArangoConverter {
 	}
 
 	private ParameterValueProvider<ArangoPersistentProperty> getParameterProvider(
-		final ArangoPersistentEntity<?> entity,
-		final VPackSlice source) {
+			final ArangoPersistentEntity<?> entity, final VPackSlice source) {
 
 		final PropertyValueProvider<ArangoPersistentProperty> provider = new ArangoPropertyValueProvider(entity,
 				source);
@@ -565,11 +555,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void writeInternal(
-		final String attribute,
-		final Object source,
-		final VPackBuilder sink,
-		final TypeInformation<?> definedType) {
+	private void writeInternal(final String attribute, final Object source, final VPackBuilder sink,
+			final TypeInformation<?> definedType) {
 
 		final Class<?> rawType = source.getClass();
 		final TypeInformation<?> type = ClassTypeInformation.from(rawType);
@@ -606,12 +593,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 		}
 	}
 
-	private void writeEntity(
-		final String attribute,
-		final Object source,
-		final VPackBuilder sink,
-		final ArangoPersistentEntity<?> entity,
-		final TypeInformation<?> definedType) {
+	private void writeEntity(final String attribute, final Object source, final VPackBuilder sink,
+			final ArangoPersistentEntity<?> entity, final TypeInformation<?> definedType) {
 
 		sink.add(attribute, ValueType.OBJECT);
 
@@ -648,10 +631,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 		sink.close();
 	}
 
-	private void addKeyIfNecessary(
-		final ArangoPersistentEntity<?> entity,
-		final Object source,
-		final VPackBuilder sink) {
+	private void addKeyIfNecessary(final ArangoPersistentEntity<?> entity, final Object source,
+			final VPackBuilder sink) {
 		if (!entity.hasIdProperty() || entity.getIdentifierAccessor(source).getIdentifier() == null) {
 			final Object id = entity.getArangoIdAccessor(source).getIdentifier();
 			if (id != null) {
@@ -670,9 +651,9 @@ public class DefaultArangoConverter implements ArangoConverter {
 
 		if (property.getRef().isPresent()) {
 			if (sourceType.isCollectionLike()) {
-				writeReferences(fieldName, source, sink);
+				writeReferences(fieldName, source, sink, property.getRef());
 			} else {
-				writeReference(fieldName, source, sink);
+				writeReference(fieldName, source, sink, property.getRef());
 			}
 		}
 
@@ -682,7 +663,7 @@ public class DefaultArangoConverter implements ArangoConverter {
 
 		else if (property.getFrom().isPresent() || property.getTo().isPresent()) {
 			if (!sourceType.isCollectionLike()) {
-				writeReference(fieldName, source, sink);
+				writeReference(fieldName, source, sink, property.getRef());
 			}
 		}
 
@@ -692,11 +673,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 		}
 	}
 
-	private void writeMap(
-		final String attribute,
-		final Map<? extends Object, ? extends Object> source,
-		final VPackBuilder sink,
-		final TypeInformation<?> definedType) {
+	private void writeMap(final String attribute, final Map<? extends Object, ? extends Object> source,
+			final VPackBuilder sink, final TypeInformation<?> definedType) {
 
 		sink.add(attribute, ValueType.OBJECT);
 
@@ -710,11 +688,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 		sink.close();
 	}
 
-	private void writeCollection(
-		final String attribute,
-		final Object source,
-		final VPackBuilder sink,
-		final TypeInformation<?> definedType) {
+	private void writeCollection(final String attribute, final Object source, final VPackBuilder sink,
+			final TypeInformation<?> definedType) {
 
 		sink.add(attribute, ValueType.ARRAY);
 
@@ -725,11 +700,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 		sink.close();
 	}
 
-	private void writeArray(
-		final String attribute,
-		final Object source,
-		final VPackBuilder sink,
-		final TypeInformation<?> definedType) {
+	private void writeArray(final String attribute, final Object source, final VPackBuilder sink,
+			final TypeInformation<?> definedType) {
 
 		if (byte[].class.equals(source.getClass())) {
 			sink.add(attribute, Base64Utils.encodeToString((byte[]) source));
@@ -745,27 +717,27 @@ public class DefaultArangoConverter implements ArangoConverter {
 		}
 	}
 
-	private void writeReferences(final String attribute, final Object source, final VPackBuilder sink) {
+	private void writeReferences(final String attribute, final Object source, final VPackBuilder sink, Optional<Ref> optional) {
 		sink.add(attribute, ValueType.ARRAY);
 
 		if (source.getClass().isArray()) {
 			for (int i = 0; i < Array.getLength(source); ++i) {
 				final Object element = Array.get(source, i);
-				writeReference(null, element, sink);
+				writeReference(null, element, sink, optional);
 			}
 		}
 
 		else {
 			for (final Object element : asCollection(source)) {
-				writeReference(null, element, sink);
+				writeReference(null, element, sink, optional);
 			}
 		}
 
 		sink.close();
 	}
 
-	private void writeReference(final String attribute, final Object source, final VPackBuilder sink) {
-		getRefId(source).ifPresent(id -> sink.add(attribute, id));
+	private void writeReference(final String attribute, final Object source, final VPackBuilder sink, Optional<Ref> optional) {
+		getRefId(source, optional).ifPresent(id -> sink.add(attribute, id));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -850,11 +822,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 		}
 	}
 
-	private void writeBaseDocument(
-		final String attribute,
-		final BaseDocument source,
-		final VPackBuilder sink,
-		final TypeInformation<?> definedType) {
+	private void writeBaseDocument(final String attribute, final BaseDocument source, final VPackBuilder sink,
+			final TypeInformation<?> definedType) {
 
 		final VPackBuilder builder = new VPackBuilder();
 		writeMap(attribute, source.getProperties(), builder, definedType);
@@ -864,11 +833,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 		sink.add(attribute, builder.slice());
 	}
 
-	private void writeBaseEdgeDocument(
-		final String attribute,
-		final BaseEdgeDocument source,
-		final VPackBuilder sink,
-		final TypeInformation<?> definedType) {
+	private void writeBaseEdgeDocument(final String attribute, final BaseEdgeDocument source, final VPackBuilder sink,
+			final TypeInformation<?> definedType) {
 
 		final VPackBuilder builder = new VPackBuilder();
 		writeMap(attribute, source.getProperties(), builder, definedType);
@@ -880,18 +846,24 @@ public class DefaultArangoConverter implements ArangoConverter {
 		sink.add(attribute, builder.slice());
 	}
 
-	private Optional<String> getRefId(final Object source) {
-		return getRefId(source, context.getPersistentEntity(source.getClass()));
+	private Optional<String> getRefId(final Object source, Optional<Ref> optional) {
+		return getRefId(source, context.getPersistentEntity(source.getClass()), optional);
 	}
 
-	private Optional<String> getRefId(final Object source, final ArangoPersistentEntity<?> entity) {
+	private Optional<String> getRefId(final Object source, final ArangoPersistentEntity<?> entity, Optional<Ref> optional) {
 		if (source instanceof LazyLoadingProxy) {
 			return Optional.of(((LazyLoadingProxy) source).getRefId());
 		}
 
 		final Optional<Object> id = Optional.ofNullable(entity.getIdentifierAccessor(source).getIdentifier());
 		if (id.isPresent()) {
-			return id.map(key -> MetadataUtils.createIdFromCollectionAndKey(entity.getCollection(), convertId(key)));
+			System.out.println("------@@@@@ ------ " + id + " -------- " + entity + " ------- ");
+//			return id.map(key -> MetadataUtils.createIdFromCollectionAndKey(entity.getCollection(), convertId(key)));
+//			Annotation xz = Ref.class;
+			final Optional<ReferenceResolver<Annotation>> resolver = resolverFactory.getReferenceResolver(optional.get());
+			
+			return  id.map(key -> resolver.get().writeRef(source, entity, convertId(key)));
+//			return id.map(key -> MetadataUtils.createIdFromCollectionAndKey(entity.getCollection(), convertId(key)));
 		}
 
 		return Optional.ofNullable((String) entity.getArangoIdAccessor(source).getIdentifier());
@@ -931,10 +903,8 @@ public class DefaultArangoConverter implements ArangoConverter {
 				: type.isAssignableFrom(source.getClass()) ? source : conversionService.convert(source, type));
 	}
 
-	private void addTypeKeyIfNecessary(
-		final TypeInformation<?> definedType,
-		final Object value,
-		final VPackBuilder sink) {
+	private void addTypeKeyIfNecessary(final TypeInformation<?> definedType, final Object value,
+			final VPackBuilder sink) {
 
 		final Class<?> referenceType = definedType != null ? definedType.getType() : Object.class;
 		final Class<?> valueType = ClassUtils.getUserClass(value.getClass());
