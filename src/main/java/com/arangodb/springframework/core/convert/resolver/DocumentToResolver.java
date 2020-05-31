@@ -26,6 +26,8 @@ import com.arangodb.ArangoCursor;
 import com.arangodb.model.AqlQueryOptions;
 import com.arangodb.springframework.annotation.To;
 import com.arangodb.springframework.core.ArangoOperations;
+import com.arangodb.springframework.core.mapping.ArangoPersistentEntity;
+import com.arangodb.springframework.core.util.MetadataUtils;
 import com.arangodb.util.MapBuilder;
 
 /**
@@ -67,4 +69,8 @@ public class DocumentToResolver extends AbstractResolver<To> implements Relation
 			type);
 	}
 
+	@Override
+	public String write(Object source, ArangoPersistentEntity<?> entity, String id) {
+		return MetadataUtils.createIdFromCollectionAndKey(entity.getCollection(), id);
+	}
 }

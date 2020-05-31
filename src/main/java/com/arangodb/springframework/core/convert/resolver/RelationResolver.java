@@ -24,6 +24,8 @@ import java.lang.annotation.Annotation;
 
 import org.springframework.data.util.TypeInformation;
 
+import com.arangodb.springframework.core.mapping.ArangoPersistentEntity;
+
 /**
  * @author Mark Vollmary
  *
@@ -33,5 +35,7 @@ public interface RelationResolver<A extends Annotation> {
 	Object resolveOne(String id, TypeInformation<?> type, A annotation);
 
 	Object resolveMultiple(String id, TypeInformation<?> type, A annotation);
+	
+	String write(Object source, ArangoPersistentEntity<?> entity, String key);
 
 }

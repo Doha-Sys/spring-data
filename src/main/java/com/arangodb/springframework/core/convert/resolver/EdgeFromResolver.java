@@ -24,6 +24,8 @@ import org.springframework.data.util.TypeInformation;
 
 import com.arangodb.springframework.annotation.From;
 import com.arangodb.springframework.core.ArangoOperations;
+import com.arangodb.springframework.core.mapping.ArangoPersistentEntity;
+import com.arangodb.springframework.core.util.MetadataUtils;
 
 /**
  * @author Mark Vollmary
@@ -50,6 +52,11 @@ public class EdgeFromResolver extends AbstractResolver<From> implements Relation
 	@Override
 	public Object resolveMultiple(final String id, final TypeInformation<?> type, final From annotation) {
 		throw new UnsupportedOperationException("Edges with multiple 'from' values are not supported.");
+	}
+
+	@Override
+	public String write(Object source, ArangoPersistentEntity<?> entity, String id) {
+		return MetadataUtils.createIdFromCollectionAndKey(entity.getCollection(), id);
 	}
 
 }

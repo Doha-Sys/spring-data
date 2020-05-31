@@ -24,6 +24,8 @@ import org.springframework.data.util.TypeInformation;
 
 import com.arangodb.springframework.annotation.To;
 import com.arangodb.springframework.core.ArangoOperations;
+import com.arangodb.springframework.core.mapping.ArangoPersistentEntity;
+import com.arangodb.springframework.core.util.MetadataUtils;
 
 /**
  * @author Mark Vollmary
@@ -52,4 +54,8 @@ public class EdgeToResolver extends AbstractResolver<To> implements RelationReso
 		throw new UnsupportedOperationException("Edges with multiple 'to' values are not supported.");
 	}
 
+	@Override
+	public String write(Object source, ArangoPersistentEntity<?> entity, String id) {
+		return MetadataUtils.createIdFromCollectionAndKey(entity.getCollection(), id);
+	}
 }
