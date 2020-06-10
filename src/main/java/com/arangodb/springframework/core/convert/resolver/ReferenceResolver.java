@@ -37,5 +37,6 @@ public interface ReferenceResolver<A extends Annotation> {
 
 	Object resolveMultiple(Collection<String> ids, TypeInformation<?> type, A annotation);
 	
-	String write(Object source, ArangoPersistentEntity<?> entity, String key);
+	String write(Object source, ArangoPersistentEntity<?> entity, Object key);
+	
 }

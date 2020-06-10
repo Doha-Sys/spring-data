@@ -62,8 +62,8 @@ public class RefResolver extends AbstractResolver<Ref>
 	}
 
 	@Override
-	public String write(Object source, ArangoPersistentEntity<?> entity, String id) {
-		return MetadataUtils.createIdFromCollectionAndKey(entity.getCollection(), id);
+	public String write(Object source, ArangoPersistentEntity<?> entity, Object id) {
+		return MetadataUtils.createIdFromCollectionAndKey(entity.getCollection(), String.valueOf(id));
 	}
 
 }

@@ -70,7 +70,7 @@ public class SimpleArangoRepository<T, ID> implements ArangoRepository<T, ID> {
 		this.arangoOperations = arangoOperations;
 		this.domainClass = domainClass;
 		this.exampleConverter = new ArangoExampleConverter(
-				(ArangoMappingContext) arangoOperations.getConverter().getMappingContext());
+				(ArangoMappingContext) arangoOperations.getConverter().getMappingContext(), arangoOperations.getResolverFactory());
 	}
 
 	/**

@@ -20,6 +20,7 @@
 
 package com.arangodb.springframework.repository;
 
+import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -31,19 +32,25 @@ import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.util.Assert;
 
+import com.arangodb.springframework.core.convert.resolver.ReferenceResolver;
+import com.arangodb.springframework.core.convert.resolver.ResolverFactory;
 import com.arangodb.springframework.core.mapping.ArangoMappingContext;
 import com.arangodb.springframework.core.mapping.ArangoPersistentEntity;
 import com.arangodb.springframework.core.mapping.ArangoPersistentProperty;
 
 /**
- * Converts Example to String representing predicate expression and puts necessary bindings in the given bindVars Map
+ * Converts Example to String representing predicate expression and puts
+ * necessary bindings in the given bindVars Map
  */
 public class ArangoExampleConverter<T> {
 
 	private final ArangoMappingContext context;
+	private final ResolverFactory resolverFactory;
 
-	public ArangoExampleConverter(final ArangoMappingContext context) {
+	public ArangoExampleConverter(final ArangoMappingContext context, final ResolverFactory resolverFactory) {
 		this.context = context;
+		this.resolverFactory = resolverFactory;
+
 	}
 
 	public String convertExampleToPredicate(final Example<T> example, final Map<String, Object> bindVars) {
@@ -54,14 +61,9 @@ public class ArangoExampleConverter<T> {
 		return predicateBuilder.toString();
 	}
 
-	private void traversePropertyTree(
-		final Example<T> example,
-		final StringBuilder predicateBuilder,
-		final Map<String, Object> bindVars,
-		final String path,
-		final String javaPath,
-		final ArangoPersistentEntity<?> entity,
-		final Object object) {
+	private void traversePropertyTree(final Example<T> example, final StringBuilder predicateBuilder,
+			final Map<String, Object> bindVars, final String path, final String javaPath,
+			final ArangoPersistentEntity<?> entity, final Object object) {
 		final PersistentPropertyAccessor<?> accessor = entity.getPropertyAccessor(object);
 		entity.doWithProperties((final ArangoPersistentProperty property) -> {
 			if (property.getFrom().isPresent() || property.getTo().isPresent() || property.getRelations().isPresent()) {
@@ -73,7 +75,7 @@ public class ArangoExampleConverter<T> {
 			if (property.isEntity() && value != null) {
 				final ArangoPersistentEntity<?> persistentEntity = context.getPersistentEntity(property.getType());
 				traversePropertyTree(example, predicateBuilder, bindVars, fullPath, fullJavaPath, persistentEntity,
-					value);
+						value);
 			} else if (!example.getMatcher().isIgnoredPath(fullJavaPath) && (value != null
 					|| example.getMatcher().getNullHandler().equals(ExampleMatcher.NullHandler.INCLUDE))) {
 				addPredicate(example, predicateBuilder, bindVars, fullPath, fullJavaPath, value);
@@ -91,20 +93,23 @@ public class ArangoExampleConverter<T> {
 				final ArangoPersistentEntity<?> persistentEntity = context.getPersistentEntity(property.getType());
 				final PersistentPropertyAccessor<?> associatedAccessor = persistentEntity.getPropertyAccessor(value);
 				final Object idValue = associatedAccessor.getProperty(persistentEntity.getIdProperty());
+				final Optional<ReferenceResolver<Annotation>> resolver = resolverFactory.getReferenceResolver(property.getRef().get());
+				// TODO: PAULO
+//				Ref x = property.getRef().get();
+				System.out.println("-------------" + resolver.get().write(value, persistentEntity, idValue));
 
-				String refIdValue = String.format("%s/%s", persistentEntity.getCollection(), idValue);
+				// Pegar o Ref (anottation)
+				// chamo write
+				// String refIdValue = retorno do write;
+
+				String refIdValue = resolver.get().write(value, persistentEntity, idValue);
 				addPredicate(example, predicateBuilder, bindVars, fullPath, fullJavaPath, refIdValue);
 			}
 		});
 	}
 
-	private void addPredicate(
-		final Example<T> example,
-		final StringBuilder predicateBuilder,
-		final Map<String, Object> bindVars,
-		final String fullPath,
-		final String fullJavaPath,
-		Object value) {
+	private void addPredicate(final Example<T> example, final StringBuilder predicateBuilder,
+			final Map<String, Object> bindVars, final String fullPath, final String fullJavaPath, Object value) {
 		final String delimiter = example.getMatcher().isAllMatching() ? " AND " : " OR ";
 		if (predicateBuilder.length() > 0) {
 			predicateBuilder.append(delimiter);
