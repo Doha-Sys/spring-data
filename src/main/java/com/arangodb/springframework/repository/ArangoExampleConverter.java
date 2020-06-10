@@ -96,7 +96,7 @@ public class ArangoExampleConverter<T> {
 				final Optional<ReferenceResolver<Annotation>> resolver = resolverFactory.getReferenceResolver(property.getRef().get());
 				// TODO: PAULO
 //				Ref x = property.getRef().get();
-				System.out.println("-------------" + resolver.get().write(value, persistentEntity, idValue));
+//				System.out.println("-------------" + resolver.get().write(value, persistentEntity, idValue));
 
 				// Pegar o Ref (anottation)
 				// chamo write
