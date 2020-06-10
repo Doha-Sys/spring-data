@@ -94,7 +94,7 @@ public class ArangoExampleConverter<T> {
 				final PersistentPropertyAccessor<?> associatedAccessor = persistentEntity.getPropertyAccessor(value);
 				final Object idValue = associatedAccessor.getProperty(persistentEntity.getIdProperty());
 				final Optional<ReferenceResolver<Annotation>> resolver = resolverFactory.getReferenceResolver(property.getRef().get());
-				// TODO: PAULO
+				// PAULO
 //				Ref x = property.getRef().get();
 //				System.out.println("-------------" + resolver.get().write(value, persistentEntity, idValue));
 
