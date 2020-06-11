@@ -80,14 +80,12 @@ import com.arangodb.velocypack.ValueType;
 import com.arangodb.velocypack.internal.util.DateUtil;
 import com.arangodb.velocypack.module.jdk8.internal.util.JavaTimeUtil;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * @author Mark Vollmary
  * @author Christian Lechner
  * @author Reşat SABIQ
  */
-@Slf4j
+
 public class DefaultArangoConverter implements ArangoConverter {
 
 	private static final String _ID = "_id";
