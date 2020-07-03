@@ -20,16 +20,17 @@
 
 package com.arangodb.springframework.debug.repository;
 
-import com.arangodb.springframework.AbstractArangoTest;
-import com.arangodb.springframework.debug.repository.entity.LongEntity;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+import java.util.Optional;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import com.arangodb.springframework.AbstractArangoTest;
+import com.arangodb.springframework.debug.repository.entity.LongEntity;
 
 /**
  * @author Michele Rastelli

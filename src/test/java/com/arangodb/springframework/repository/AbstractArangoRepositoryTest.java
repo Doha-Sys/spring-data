@@ -8,12 +8,12 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-import com.arangodb.springframework.repository.query.ShoppingCartRepository;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.GeoResult;
 
 import com.arangodb.springframework.AbstractArangoTest;
+import com.arangodb.springframework.repository.query.ShoppingCartRepository;
 import com.arangodb.springframework.testdata.Address;
 import com.arangodb.springframework.testdata.Contains;
 import com.arangodb.springframework.testdata.Customer;

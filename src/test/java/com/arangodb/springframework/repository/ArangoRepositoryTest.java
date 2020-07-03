@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import com.arangodb.springframework.testdata.ShoppingCart;
 import org.junit.Test;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -22,6 +21,7 @@ import org.springframework.data.domain.Sort;
 
 import com.arangodb.springframework.testdata.Address;
 import com.arangodb.springframework.testdata.Customer;
+import com.arangodb.springframework.testdata.ShoppingCart;
 
 /**
  * Created by F625633 on 06/07/2017.
@@ -168,6 +168,30 @@ public class ArangoRepositoryTest extends AbstractArangoRepositoryTest {
 		toBeRetrieved.add(new Customer("C", "V", 0));
 		repository.saveAll(toBeRetrieved);
 		final Example<Customer> example = Example.of(new Customer("B", null, 0));
+		final Iterable<?> retrieved = repository.findAll(example);
+		final List<Customer> retrievedList = new LinkedList<>();
+		retrieved.forEach(e -> retrievedList.add((Customer) e));
+		final List<Customer> checkList = new LinkedList<>();
+		checkList.add(check1);
+		checkList.add(check2);
+		assertTrue(equals(checkList, retrievedList, cmp, eq, false));
+	}
+	
+	@Test
+	public void findAllByExampleRegexTest() {
+		final List<Customer> toBeRetrieved = new LinkedList<>();
+		final Customer check1 = new Customer("B", "X", 0);
+		final Customer check2 = new Customer("B", "Y", 0);
+		toBeRetrieved.add(new Customer("A", "Z", 0));
+		toBeRetrieved.add(check1);
+		toBeRetrieved.add(check2);
+		toBeRetrieved.add(new Customer("C", "V", 0));
+		repository.saveAll(toBeRetrieved);
+		Customer find = new Customer("([B])", null, 0);
+		 ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+				 .withIgnoreNullValues()
+				 .withMatcher("name", match -> match.regex());
+		final Example<Customer> example = Example.of(find,exampleMatcher);
 		final Iterable<?> retrieved = repository.findAll(example);
 		final List<Customer> retrievedList = new LinkedList<>();
 		retrieved.forEach(e -> retrievedList.add((Customer) e));

@@ -20,9 +20,9 @@
 
 package com.arangodb.springframework.example.polymorphic.entity;
 
-import org.springframework.data.annotation.Id;
-
 import java.util.Objects;
+
+import org.springframework.data.annotation.Id;
 
 /**
  * @author Michele Rastelli

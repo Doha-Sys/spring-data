@@ -21,10 +21,11 @@
 package com.arangodb.springframework.debug.repository;
 
 
-import com.arangodb.springframework.annotation.Document;
+import java.util.Objects;
+
 import org.springframework.data.annotation.PersistenceConstructor;
 
-import java.util.Objects;
+import com.arangodb.springframework.annotation.Document;
 
 /**
  * @author Michele Rastelli

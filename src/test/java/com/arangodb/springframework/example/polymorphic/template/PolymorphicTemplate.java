@@ -20,18 +20,19 @@
 
 package com.arangodb.springframework.example.polymorphic.template;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.arangodb.ArangoCursor;
 import com.arangodb.springframework.AbstractArangoTest;
 import com.arangodb.springframework.example.polymorphic.entity.Animal;
 import com.arangodb.springframework.example.polymorphic.entity.Dog;
 import com.arangodb.springframework.example.polymorphic.entity.Eagle;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.List;
-
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * @author Michele Rastelli

@@ -20,8 +20,9 @@
 
 package com.arangodb.springframework.debug.repository.entity;
 
-import com.arangodb.springframework.annotation.Document;
 import org.springframework.data.annotation.Id;
+
+import com.arangodb.springframework.annotation.Document;
 
 /**
  * @author Michele Rastelli

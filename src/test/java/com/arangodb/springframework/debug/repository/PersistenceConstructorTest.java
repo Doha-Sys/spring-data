@@ -21,12 +21,13 @@
 package com.arangodb.springframework.debug.repository;
 
 
-import com.arangodb.entity.DocumentEntity;
-import com.arangodb.springframework.AbstractArangoTest;
+import static org.hamcrest.Matchers.is;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.is;
+import com.arangodb.entity.DocumentEntity;
+import com.arangodb.springframework.AbstractArangoTest;
 
 /**
  * @author Michele Rastelli
