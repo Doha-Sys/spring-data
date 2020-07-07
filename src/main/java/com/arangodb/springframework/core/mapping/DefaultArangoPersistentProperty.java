@@ -20,6 +20,7 @@
 
 package com.arangodb.springframework.core.mapping;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.mapping.Association;
@@ -143,6 +144,11 @@ public class DefaultArangoPersistentProperty extends AnnotationBasedPersistentPr
 	@Override
 	public Optional<FulltextIndexed> getFulltextIndexed() {
 		return Optional.ofNullable(findAnnotation(FulltextIndexed.class));
+	}
+	
+	@Override
+	public boolean isList() {
+		return getType().equals(List.class);
 	}
 
 }

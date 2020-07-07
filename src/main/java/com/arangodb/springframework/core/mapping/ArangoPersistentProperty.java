@@ -63,5 +63,7 @@ public interface ArangoPersistentProperty extends PersistentProperty<ArangoPersi
 	Optional<GeoIndexed> getGeoIndexed();
 
 	Optional<FulltextIndexed> getFulltextIndexed();
+	
+	boolean isList();
 
 }
