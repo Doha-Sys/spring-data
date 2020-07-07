@@ -88,7 +88,7 @@ public class ArangoExampleConverter<T> {
 				final StringBuilder predicateBuilderArray = new StringBuilder();				
 				List<?> x = (List<?>) value;
 				for (Object z : x) {
-					traversePropertyTree(example, predicateBuilderArray, bindVars, "", "", persistentEntity, z, "CURRENT");
+					traversePropertyTree(example, predicateBuilderArray, bindVars, "", fullJavaPath, persistentEntity, z, "CURRENT");
 				}
 				String clause = String.format("LENGTH(%s.%s[* FILTER %s ])>0", bindEntintyName, property.getName(), predicateBuilderArray.toString());
 				predicateBuilder.append(clause);
