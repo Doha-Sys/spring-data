@@ -21,6 +21,7 @@
 package com.arangodb.springframework.testdata;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 
@@ -57,6 +58,7 @@ public class Customer {
 	private Iterable<String> stringList;
 	private Customer nestedCustomer;
 	private Iterable<Customer> nestedCustomers;
+	private List<Customer> nestedCustomersList;
 
 	@Ref
 	private ShoppingCart shoppingCart;
@@ -227,6 +229,14 @@ public class Customer {
 
 	public Iterable<String> getStringList() {
 		return stringList;
+	}
+
+	public List<Customer> getNestedCustomersList() {
+		return nestedCustomersList;
+	}
+
+	public void setNestedCustomersList(List<Customer> nestedCustomersList) {
+		this.nestedCustomersList = nestedCustomersList;
 	}
 
 	@Override

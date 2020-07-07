@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -287,16 +288,21 @@ public class ArangoRepositoryTest extends AbstractArangoRepositoryTest {
 	}
 
 	@Test
-	public void startingWithByExampleTest() {
+	public void findAllByExampleWhitArrayTest() {
 		final List<Customer> toBeRetrieved = new LinkedList<>();
 		final Customer check = new Customer("Abba", "Bbaaaa", 100);
+		final Customer nested = new Customer("Bwa?[a.b]baAa", "", 67);
+		final Customer nested2 = new Customer("qwerty", "", 10);
+		check.setNestedCustomersList(Arrays.asList(nested,nested2));
 		toBeRetrieved.add(check);
 		toBeRetrieved.add(new Customer("Baabba", "", 67));
 		toBeRetrieved.add(new Customer("B", "", 43));
 		toBeRetrieved.add(new Customer("C", "", 76));
 		repository.saveAll(toBeRetrieved);
-		final Example<Customer> example = Example.of(new Customer(null, "bb", 100), ExampleMatcher.matching()
-				.withMatcher("surname", match -> match.startsWith()).withIgnoreCase("surname").withIgnoreNullValues());
+		final Customer exampleCustomer = new Customer("Abba", "Bbaaaa", 100);
+		final Customer exampleNested = new Customer("Bwa?[a.b]baAa", "", 67);
+		exampleCustomer.setNestedCustomersList(Arrays.asList(exampleNested));
+		final Example<Customer> example = Example.of(exampleCustomer);
 		final Customer retrieved = repository.findOne(example).get();
 		assertEquals(check, retrieved);
 	}
@@ -365,6 +371,21 @@ public class ArangoRepositoryTest extends AbstractArangoRepositoryTest {
 		final Optional<Customer> retrieved = repository.findOne(example);
 		assertThat(retrieved.isPresent(), is(true));
 		assertThat(retrieved.get().getName(), is("name"));
+	}
+	
+	@Test
+	public void startingWithByExampleTest() {
+		final List<Customer> toBeRetrieved = new LinkedList<>();
+		final Customer check = new Customer("Abba", "Bbaaaa", 100);
+		toBeRetrieved.add(check);
+		toBeRetrieved.add(new Customer("Baabba", "", 67));
+		toBeRetrieved.add(new Customer("B", "", 43));
+		toBeRetrieved.add(new Customer("C", "", 76));
+		repository.saveAll(toBeRetrieved);
+		final Example<Customer> example = Example.of(new Customer(null, "bb", 100), ExampleMatcher.matching()
+				.withMatcher("surname", match -> match.startsWith()).withIgnoreCase("surname").withIgnoreNullValues());
+		final Customer retrieved = repository.findOne(example).get();
+		assertEquals(check, retrieved);
 	}
 
 	@Test

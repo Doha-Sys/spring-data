@@ -90,6 +90,9 @@ public class ArangoExampleConverter<T> {
 				for (Object z : x) {
 					traversePropertyTree(example, predicateBuilderArray, bindVars, "", fullJavaPath, persistentEntity, z, "CURRENT");
 				}
+				if (predicateBuilder.length() > 0) {
+					predicateBuilder.append(" AND ");
+				}
 				String clause = String.format("LENGTH(%s.%s[* FILTER %s ])>0", bindEntintyName, property.getName(), predicateBuilderArray.toString());
 				predicateBuilder.append(clause);
 
