@@ -85,13 +85,19 @@ public class ArangoExampleConverter<T> {
 						.getPersistentEntity(property.getActualType());
 				log.debug("persistentEntity {}", persistentEntity);
 				log.debug("value {}, {}", value, value.getClass());
-				final StringBuilder predicateBuilderArray = new StringBuilder();				
+				final StringBuilder predicateBuilderArray = new StringBuilder();			
 				List<?> x = (List<?>) value;
 				for (Object z : x) {
-					traversePropertyTree(example, predicateBuilderArray, bindVars, "", fullJavaPath, persistentEntity, z, "CURRENT");
+					final StringBuilder predicateBuilderArrayItem = new StringBuilder();
+					traversePropertyTree(example, predicateBuilderArrayItem, bindVars, "", fullJavaPath, persistentEntity, z, "CURRENT");
+					if (predicateBuilderArray.length() > 0) {
+						predicateBuilderArray.append(" OR ");
+					}
+					predicateBuilderArray.append(predicateBuilderArrayItem.toString());
 				}
+				final String delimiter = example.getMatcher().isAllMatching() ? " AND " : " OR ";
 				if (predicateBuilder.length() > 0) {
-					predicateBuilder.append(" AND ");
+					predicateBuilder.append(delimiter);
 				}
 				String clause = String.format("LENGTH(%s.%s[* FILTER %s ])>0", bindEntintyName, property.getName(), predicateBuilderArray.toString());
 				predicateBuilder.append(clause);
