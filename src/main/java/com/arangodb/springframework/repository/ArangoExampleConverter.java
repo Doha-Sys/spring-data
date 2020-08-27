@@ -24,6 +24,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -62,7 +63,9 @@ public class ArangoExampleConverter<T> {
 		final ArangoPersistentEntity<?> persistentEntity = context.getPersistentEntity(example.getProbeType());
 		Assert.isTrue(example.getProbe() != null, "Probe in Example cannot be null");
 		final String bindEntintyName = "e";
-		traversePropertyTree(example, predicateBuilder, bindVars, "", "", persistentEntity, example.getProbe(), bindEntintyName);
+		traversePropertyTree(example, predicateBuilder, bindVars, "", "", persistentEntity, example.getProbe(),
+				bindEntintyName);
+		log.info("END ******** {}", predicateBuilder.toString());
 		return predicateBuilder.toString();
 	}
 
@@ -70,7 +73,7 @@ public class ArangoExampleConverter<T> {
 			final Map<String, Object> bindVars, final String path, final String javaPath,
 			final ArangoPersistentEntity<?> entity, final Object object, final String bindEntintyName) {
 		final PersistentPropertyAccessor<?> accessor = entity.getPropertyAccessor(object);
-		
+
 		entity.doWithProperties((final ArangoPersistentProperty property) -> {
 			if (property.getFrom().isPresent() || property.getTo().isPresent() || property.getRelations().isPresent()) {
 				return;
@@ -80,16 +83,23 @@ public class ArangoExampleConverter<T> {
 			final Object value = accessor.getProperty(property);
 			log.debug("traversePropertyTree - property {}, name {}, isArray {}, getType {}, getActualType: {}",
 					property, property.getName(), property.isArray(), property.getType(), property.getActualType());
-			if (property.isList() && value != null) {
+			if (property.isCollectionLike() && value != null) {
 				final ArangoPersistentEntity<?> persistentEntity = context
 						.getPersistentEntity(property.getActualType());
 				log.debug("persistentEntity {}", persistentEntity);
 				log.debug("value {}, {}", value, value.getClass());
-				final StringBuilder predicateBuilderArray = new StringBuilder();			
+				final StringBuilder predicateBuilderArray = new StringBuilder();
+
 				List<?> x = (List<?>) value;
 				for (Object z : x) {
+					log.info("z++++++++++ {},{},{}", z, z.getClass(), String.class);
 					final StringBuilder predicateBuilderArrayItem = new StringBuilder();
-					traversePropertyTree(example, predicateBuilderArrayItem, bindVars, "", fullJavaPath, persistentEntity, z, "CURRENT");
+					if (z.getClass() == String.class) {
+						addPredicate(example, predicateBuilderArrayItem, bindVars, null, fullJavaPath, z, "CURRENT");
+					} else {
+						traversePropertyTree(example, predicateBuilderArrayItem, bindVars, "", fullJavaPath,
+								persistentEntity, z, "CURRENT");
+					}
 					if (predicateBuilderArray.length() > 0) {
 						predicateBuilderArray.append(" OR ");
 					}
@@ -99,7 +109,8 @@ public class ArangoExampleConverter<T> {
 				if (predicateBuilder.length() > 0) {
 					predicateBuilder.append(delimiter);
 				}
-				String clause = String.format("LENGTH(%s.%s[* FILTER %s ])>0", bindEntintyName, property.getName(), predicateBuilderArray.toString());
+				String clause = String.format("LENGTH(%s.%s[* FILTER %s ])>0", bindEntintyName, property.getName(),
+						predicateBuilderArray.toString());
 				predicateBuilder.append(clause);
 
 			} else if (property.isEntity() && value != null) {
@@ -134,7 +145,8 @@ public class ArangoExampleConverter<T> {
 	}
 
 	private void addPredicate(final Example<T> example, final StringBuilder predicateBuilder,
-			final Map<String, Object> bindVars, final String fullPath, final String fullJavaPath, Object value, final String bindEntintyName) {
+			final Map<String, Object> bindVars, final String fullPath, final String fullJavaPath, Object value,
+			final String bindEntintyName) {
 		final String delimiter = example.getMatcher().isAllMatching() ? " AND " : " OR ";
 		if (predicateBuilder.length() > 0) {
 			predicateBuilder.append(delimiter);
@@ -157,9 +169,19 @@ public class ArangoExampleConverter<T> {
 							: specifier.getStringMatcher();
 			final String string = (String) value;
 			if (stringMatcher == ExampleMatcher.StringMatcher.REGEX) {
-				clause = String.format("REGEX_TEST(%s.%s, @%s, %b)", bindEntintyName, fullPath, binding, ignoreCase);
+				if (Objects.isNull(fullPath)) {
+					clause = String.format("REGEX_TEST(%s, @%s, %b)", bindEntintyName, binding, ignoreCase);
+				} else {
+					clause = String.format("REGEX_TEST(%s.%s, @%s, %b)", bindEntintyName, fullPath, binding,
+							ignoreCase);
+				}
 			} else {
-				clause = String.format("LIKE(%s.%s, @%s, %b)", bindEntintyName, fullPath, binding, ignoreCase);
+				if (Objects.isNull(fullPath)) {
+					clause = String.format("LIKE(%s, @%s, %b)", bindEntintyName, binding, ignoreCase);
+				} else {
+					clause = String.format("LIKE(%s.%s, @%s, %b)", bindEntintyName, fullPath, binding, ignoreCase);
+				}
+
 			}
 
 			switch (stringMatcher) {
@@ -182,7 +204,12 @@ public class ArangoExampleConverter<T> {
 				break;
 			}
 		} else {
-			clause = String.format("%s.%s == @%s", bindEntintyName, fullPath, binding);
+			if (Objects.isNull(fullPath)) {
+				clause = String.format("%s == @%s", bindEntintyName, binding);
+			} else {
+				clause = String.format("%s.%s == @%s", bindEntintyName, fullPath, binding);
+			}
+
 		}
 		predicateBuilder.append(clause);
 		if (value != null) {

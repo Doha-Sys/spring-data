@@ -289,8 +289,8 @@ public class ArangoRepositoryTest extends AbstractArangoRepositoryTest {
 	@Test
 	public void findAllByExampleWhitArrayTest() {
 		final List<Customer> toBeRetrieved = new LinkedList<>();
-		final Customer check = new Customer("Abba", "Bbaaaa", 100);
-		final Customer nested = new Customer("Bwa?[a.b]baAa", "", 67);
+		final Customer check = new Customer("Abba123", "Bbaaaa", 100);
+		final Customer nested = new Customer("Bwa?[a.b]baAa456", "", 67);
 		final Customer nested2 = new Customer("qwerty", "", 10);
 		check.setNestedCustomersList(Arrays.asList(nested, nested2));
 		toBeRetrieved.add(check);
@@ -298,12 +298,46 @@ public class ArangoRepositoryTest extends AbstractArangoRepositoryTest {
 		toBeRetrieved.add(new Customer("B", "", 43));
 		toBeRetrieved.add(new Customer("C", "", 76));
 		repository.saveAll(toBeRetrieved);
-		final Customer exampleCustomer = new Customer("Abba", "Bbaaaa", 100);
-		final Customer exampleNested = new Customer("Bwa?[a.b]baAa", "", 67);
+		final Customer exampleCustomer = new Customer("Abba123", "Bbaaaa", 100);
+		final Customer exampleNested = new Customer("Bwa?[a.b]baAa456", "", 67);
 		exampleCustomer.setNestedCustomersList(Arrays.asList(exampleNested));
 		final Example<Customer> example = Example.of(exampleCustomer);
 		final Customer retrieved = repository.findOne(example).get();
 		assertEquals(check, retrieved);
+	}
+
+	@Test
+	public void findAllByExampleWhitArrayRealStringTest() {
+		final List<Customer> toBeRetrieved = new LinkedList<>();
+		final Customer customer1 = new Customer("AbbaXP", "BbaaaaXZ", 1001);
+		final Customer customer2 = new Customer("Bwa?[a.b]baAaGH", "", 67);
+		customer1.setRealStringList(Arrays.asList("testA", "testB", "testC"));
+		customer2.setRealStringList(Arrays.asList("test1", "test2", "test3"));
+		toBeRetrieved.add(customer1);
+		toBeRetrieved.add(customer2);
+		repository.saveAll(toBeRetrieved);
+		final Customer exampleCustomer = new Customer();
+		exampleCustomer.setRealStringList(Arrays.asList("testB"));
+		final Example<Customer> example = Example.of(exampleCustomer);
+		final Customer retrieved = repository.findOne(example).get();
+		assertEquals(customer1, retrieved);
+	}
+	
+	@Test
+	public void findAllByExampleWhitArrayStringTest() {
+		final List<Customer> toBeRetrieved = new LinkedList<>();
+		final Customer customer1 = new Customer("AbbaXP", "BbaaaaXZ", 1001);
+		final Customer customer2 = new Customer("Bwa?[a.b]baAaGH", "", 67);
+		customer1.setStringList(Arrays.asList("testA", "testB", "testC"));
+		customer2.setStringList(Arrays.asList("test1", "test2", "test3"));
+		toBeRetrieved.add(customer1);
+		toBeRetrieved.add(customer2);
+		repository.saveAll(toBeRetrieved);
+		final Customer exampleCustomer = new Customer();
+		exampleCustomer.setStringList(Arrays.asList("testB"));
+		final Example<Customer> example = Example.of(exampleCustomer);
+		final Customer retrieved = repository.findOne(example).get();
+		assertEquals(customer1, retrieved);
 	}
 
 	@Test
@@ -321,12 +355,12 @@ public class ArangoRepositoryTest extends AbstractArangoRepositoryTest {
 		final Customer exampleCustomer = new Customer();
 		final Customer exampleNested = new Customer("qwertyASD", "", 10);
 		exampleCustomer.setNestedCustomersList(Arrays.asList(exampleNested));
-		final Example<Customer> example = Example.of(exampleCustomer, ExampleMatcher.matching()
-				.withIgnoreNullValues().withIgnorePaths(new String[] { "location", "alive", "age" }));
+		final Example<Customer> example = Example.of(exampleCustomer, ExampleMatcher.matching().withIgnoreNullValues()
+				.withIgnorePaths(new String[] { "location", "alive", "age" }));
 		final Customer retrieved = repository.findOne(example).get();
 		assertEquals(check, retrieved);
 	}
-	
+
 	@Test
 	public void findAllByExampleWhitArrayORTest() {
 		final List<Customer> toBeRetrieved = new LinkedList<>();
@@ -343,8 +377,8 @@ public class ArangoRepositoryTest extends AbstractArangoRepositoryTest {
 		final Customer exampleNested = new Customer("qwertyASD", "", 10);
 		final Customer exampleOr = new Customer("qwertyOr", "", 10);
 		exampleCustomer.setNestedCustomersList(Arrays.asList(exampleNested, exampleOr));
-		final Example<Customer> example = Example.of(exampleCustomer, ExampleMatcher.matching()
-				.withIgnoreNullValues().withIgnorePaths(new String[] { "location", "alive", "age" }));
+		final Example<Customer> example = Example.of(exampleCustomer, ExampleMatcher.matching().withIgnoreNullValues()
+				.withIgnorePaths(new String[] { "location", "alive", "age" }));
 		final Customer retrieved = repository.findOne(example).get();
 		assertEquals(check, retrieved);
 	}

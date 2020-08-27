@@ -47,10 +47,10 @@ public class Customer {
 	private String rev;
 	private String name;
 	private String surname;
-	private int age;
+	private Integer age;
 	private Address address;
 
-	private boolean alive;
+	private Boolean alive;
 	@GeoIndexed
 	private int[] location;
 	private Iterable<Integer> integerList;
@@ -59,6 +59,7 @@ public class Customer {
 	private Customer nestedCustomer;
 	private Iterable<Customer> nestedCustomers;
 	private List<Customer> nestedCustomersList;
+	private List<String> realStringList;
 
 	@Ref
 	private ShoppingCart shoppingCart;
@@ -263,6 +264,14 @@ public class Customer {
 	@Override
 	public String toString() {
 		return "Customer {id: " + id + ", name: " + name + ", surname: " + surname + ", age: " + age + "}";
+	}
+
+	public List<String> getRealStringList() {
+		return realStringList;
+	}
+
+	public void setRealStringList(List<String> realStringList) {
+		this.realStringList = realStringList;
 	}
 
 }

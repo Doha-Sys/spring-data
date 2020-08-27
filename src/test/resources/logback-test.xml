@@ -16,4 +16,7 @@
 	<logger
 		name="com.arangodb.internal.velocystream.VstCommunicationSync"
 		level="debug" />
+		<logger
+		name="com.arangodb.springframework.repository.ArangoExampleConverter"
+		level="debug" />
 </configuration>
