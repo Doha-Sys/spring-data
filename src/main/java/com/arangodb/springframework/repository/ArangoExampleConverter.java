@@ -33,6 +33,7 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.mapping.AssociationHandler;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 import com.arangodb.springframework.core.convert.resolver.ReferenceResolver;
 import com.arangodb.springframework.core.convert.resolver.ResolverFactory;
@@ -92,9 +93,10 @@ public class ArangoExampleConverter<T> {
 
 				List<?> x = (List<?>) value;
 				for (Object z : x) {
-					log.info("z++++++++++ {},{},{}", z, z.getClass(), String.class);
+					log.info("z++++++++++ {},{},{},{}", z, z.getClass(), String.class,
+							ClassUtils.isPrimitiveOrWrapper(z.getClass()));
 					final StringBuilder predicateBuilderArrayItem = new StringBuilder();
-					if (z.getClass() == String.class) {
+					if (ClassUtils.isPrimitiveOrWrapper(z.getClass()) || z.getClass() == String.class) {
 						addPredicate(example, predicateBuilderArrayItem, bindVars, null, fullJavaPath, z, "CURRENT");
 					} else {
 						traversePropertyTree(example, predicateBuilderArrayItem, bindVars, "", fullJavaPath,
